@@ -1,0 +1,6 @@
+module CGio {
+    umbrella header "/usr/include/glib-2.0/gio/gio.h"
+    link "gio-2.0"
+
+    export *
+}

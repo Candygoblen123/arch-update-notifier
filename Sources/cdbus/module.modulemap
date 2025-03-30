@@ -1,6 +1,0 @@
-module cdbus {
-    umbrella header "/usr/include/dbus-1.0/dbus/dbus.h"
-    link "dbus-1"
-
-    export *
-}
