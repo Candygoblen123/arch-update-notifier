@@ -10,7 +10,7 @@ let package = Package(
         // Targets can depend on other targets in this package and products from dependencies.
         .executableTarget(
             name: "arch-update-notifier",
-            dependencies: [.target(name: "CGio")]),
-        .systemLibrary(name: "CGio", pkgConfig: "gio-2.0")
+            dependencies: [.target(name: "Gio")]),
+        .systemLibrary(name: "Gio", pkgConfig: "gio-2.0"),
     ]
 )
