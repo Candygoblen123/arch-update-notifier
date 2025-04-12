@@ -1,5 +1,6 @@
 import Gio
 
+/*
 var dbus = try! await DBus("moe.candy123.ArchUpdateNotifier")
 
 let argsArr = [
@@ -25,6 +26,11 @@ var tmp = try await dbus.callMethod(
 print(String(cString: g_variant_get_type_string(tmp?.pointer)))
 
 print(dbus.busName)
+*/
 
+var notif = try await NotificationServer("Arch update notifier", appID: "moe.candy123.ArchUpdateNotifier")
+
+let notifID = try await notif.sendNotification("Test", body: "Momoi", actions: ["1", "cool"])
+print(notifID)
 
 

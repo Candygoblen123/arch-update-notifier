@@ -4,7 +4,7 @@ actor DBus {
     let connection: SendableOpaquePointer
     let busName: String
 
-    init(_ name: String) async throws {
+    init(_ name: String) async throws(DBusError) {
         let (connection, busName) = await DBus.ownName("moe.candy123.ArchUpdateNotifier")
         if let connection = connection {
             self.connection = connection
@@ -44,8 +44,8 @@ actor DBus {
                 replyType: SendableOpaquePointer(replyType)
             ) { value, error in
                 guard let value = value else {
-                    print(String(cString: error!.message))
-                    continuation.resume(throwing: DBusError.methodCallError)
+                    let message = String(cString: error!.message)
+                    continuation.resume(throwing: DBusError.methodCallError(message))
                     g_main_loop_quit(mainLoop)
                     return
                 }
@@ -68,7 +68,7 @@ struct SendableOpaquePointer: @unchecked Sendable {
 
 enum DBusError: Error {
     case connectionFail
-    case methodCallError
+    case methodCallError(String)
 }
 
 
