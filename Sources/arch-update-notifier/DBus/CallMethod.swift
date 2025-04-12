@@ -13,7 +13,6 @@ internal struct DBusCallMethod {
         handler: @convention(c) @escaping (UnsafeMutablePointer<GObject>?, OpaquePointer?, gpointer?) -> ()
     ) {
         let opaqueHolder = Unmanaged.passRetained(data).toOpaque()
-        let callback = unsafeBitCast(handler, to: GAsyncReadyCallback.self)
         g_dbus_connection_call(
             connection,
             busName,
@@ -25,7 +24,7 @@ internal struct DBusCallMethod {
             G_DBUS_CALL_FLAGS_NONE,
             -1,
             nil,
-            callback,
+            handler,
             opaqueHolder
         )
     }
@@ -50,12 +49,10 @@ internal struct DBusCallMethod {
             replyType: replyType?.pointer,
             data: DBusCallMethodClosureHolder(handler)
         ) { srcObj, res, swift in
-            print("Got here 1")
             if let swift = swift {
                 var err: UnsafeMutablePointer<GError>? = nil
-                let retValues = g_dbus_connection_call_finish(.init(srcObj), res, nil)
+                let retValues = g_dbus_connection_call_finish(.init(srcObj), res, &err)
                 let holder = Unmanaged<DBusCallMethodClosureHolder>.fromOpaque(swift).takeRetainedValue()
-                print("Got here")
                 holder.callback(SendableOpaquePointer(retValues), err?.pointee)
             }
         }

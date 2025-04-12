@@ -1,11 +1,11 @@
 import Gio
 
-actor DBus {
+actor DBusConnection {
     let connection: SendableOpaquePointer
     let busName: String
 
     init(_ name: String) async throws(DBusError) {
-        let (connection, busName) = await DBus.ownName("moe.candy123.ArchUpdateNotifier")
+        let (connection, busName) = await DBusConnection.ownName("moe.candy123.ArchUpdateNotifier")
         if let connection = connection {
             self.connection = connection
             self.busName = busName
@@ -25,6 +25,7 @@ actor DBus {
         }
     }
 
+    @discardableResult
     func callMethod(
         busName: String,
         objectPath: String,
@@ -54,6 +55,28 @@ actor DBus {
 
             }
             g_main_loop_run(mainLoop)
+        }
+    }
+
+    func signalSubscribe(
+        sender: String,
+        interfaceName: String,
+        member: String,
+        objectPath: String,
+        handler: @escaping (String?, String?, String?, String?, SendableOpaquePointer?) -> ()
+    ) -> UInt32 {
+        let id = DBusSignalSubscribe.signalSubscribe(connection, sender: sender, interfaceName: interfaceName, member: member, objectPath: objectPath) { _ , senderName, objPath, interfaceName, signalName, parameters in
+            handler(DBusConnection.stringOrNil(senderName), DBusConnection.stringOrNil(objPath), DBusConnection.stringOrNil(interfaceName), DBusConnection.stringOrNil(signalName), parameters)
+        }
+        return id
+
+    }
+
+    private static func stringOrNil(_ cString: UnsafePointer<gchar>?) -> String? {
+        if let cString = cString {
+            return String(cString: cString)
+        } else {
+            return nil
         }
     }
 }
