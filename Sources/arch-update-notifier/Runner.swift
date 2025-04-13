@@ -1,12 +1,13 @@
 import Foundation
 
 struct Runner {
-    static func runProgram(_ programPath: String) async throws -> String {
+    static func runProgram(_ programPath: String, _ args: [String] = []) async throws -> String {
         return try await withCheckedThrowingContinuation { continuation in
             do {
                 let outputPipe: Pipe = Pipe()
                 let task: Process = Process()
                 task.executableURL = URL(fileURLWithPath: programPath)
+                task.arguments = args
                 task.standardOutput = outputPipe
                 task.terminationHandler = { _ in
                     do {
@@ -26,5 +27,12 @@ struct Runner {
                 continuation.resume(throwing: error)
             }
         }
+    }
+
+    static func runDetached(_ programPath: String, _ args: [String] = []) throws {
+        let task = Process()
+        task.executableURL = URL(fileURLWithPath: programPath)
+        task.arguments = args
+        try task.run()
     }
 }

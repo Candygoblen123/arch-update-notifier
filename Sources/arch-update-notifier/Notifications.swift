@@ -17,9 +17,9 @@ actor NotificationServer: Sendable {
         )
     }
 
-    func newNotification(_ summary: String, body: String, actions: [String : @Sendable (Notification) async -> ()] = [:]) async throws -> Notification {
-        let stringActions: [String] = actions.keys.enumerated()
-            .flatMap({(index, name) in [String(index), name]})
+    func newNotification(_ summary: String, body: String, actions: KeyValuePairs<String, @Sendable (Notification) async -> ()> = [:]) async throws -> Notification {
+        let stringActions: [String] = actions.enumerated()
+            .flatMap({(index, name) in [String(index), name.key]})
         let variantActions = stringActions.map({ g_variant_new_string($0) })
         let argsArr = [
             g_variant_new_string(appName),
