@@ -12,7 +12,6 @@ actor UpdateNotifier {
         guard let config = config else {
             fatalError("Config object is null. This should never happen. What did you do?")
         }
-        print(config)
 
         let mainLoop = g_main_loop_new(nil, 0)
         notifServer = try await NotificationServer("Arch update notifier", appID: "moe.candy123.ArchUpdateNotifier")

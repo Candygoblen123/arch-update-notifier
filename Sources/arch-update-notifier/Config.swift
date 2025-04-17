@@ -26,7 +26,6 @@ struct Config {
             return conf
         }
         let decode = decode(ini)
-        print(decode)
         conf.checkRepoCommand = decode["checkRepoCommand"] ?? conf.checkRepoCommand
         conf.checkAURCommand = decode["checkAURCommand"] ?? conf.checkAURCommand
         conf.updateRepoCommand = decode["updateRepoCommand"] ?? conf.updateRepoCommand
