@@ -24,17 +24,17 @@ actor UpdateNotifier {
         timer.setEventHandler {
             Task.detached {
                 do {
-                    let pacCheckCmd = config.checkRepoUpdatesCommand.split(separator: " ").map({ String($0) })
-                    let yayCheckCmd = config.checkAURUpdatesCommand.split(separator: " ").map({ String($0) })
-                    let pacCount = try await Runner.runProgram(pacCheckCmd[0], Array(pacCheckCmd.suffix(from: 1))).split(separator: "\n").count
-                    let yayCount = try await Runner.runProgram(yayCheckCmd[0], Array(yayCheckCmd.suffix(from: 1))).split(separator: "\n").count
-                    guard pacCount + yayCount != 0 else { return }
+                    let pacCheckCmd = config.checkRepoCommand.split(separator: " ").map({ String($0) })
+                    let yayCheckCmd = config.checkAURCommand.split(separator: " ").map({ String($0) })
+                    async let pacCount = Runner.runProgram(pacCheckCmd[0], Array(pacCheckCmd.suffix(from: 1))).split(separator: "\n").count
+                    async let yayCount = Runner.runProgram(yayCheckCmd[0], Array(yayCheckCmd.suffix(from: 1))).split(separator: "\n").count
+                    guard try await pacCount + yayCount != 0 else { return }
                     let _ = try await notifServer.newNotification(
                         "Updates Available",
                         body: "Outdated from repos: \(pacCount)\nOutdated from AUR: \(yayCount)",
                         actions: [
                             "Update": { notif in
-                                let yayUpdateCmd = config.updateAllCommand.split(separator: " ").map({ String($0) })
+                                let yayUpdateCmd = config.updateCommand.split(separator: " ").map({ String($0) })
                                 try! Runner.runDetached(yayUpdateCmd[0], Array(yayUpdateCmd.suffix(from: 1)))
                             }, "Update only Repo": { notif in
                                 let pacUpdateCmd = config.updateRepoCommand.split(separator: " ").map({ String($0) })
