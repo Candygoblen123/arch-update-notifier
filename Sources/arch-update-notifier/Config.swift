@@ -6,6 +6,7 @@ struct Config {
     var updateRepoCommand: String = "/usr/bin/ghostty -e /usr/bin/sudo pacman -Syu"
     var updateCommand: String = "/usr/bin/ghostty -e /usr/bin/yay --sudoloop"
     var checkUpdateInterval: Int = 1800
+    var icon: String?
 
     static func load(from filePath: String) throws -> Config {
         var conf = Config()
@@ -25,18 +26,28 @@ struct Config {
             return conf
         }
         let decode = decode(ini)
+        print(decode)
         conf.checkRepoCommand = decode["checkRepoCommand"] ?? conf.checkRepoCommand
         conf.checkAURCommand = decode["checkAURCommand"] ?? conf.checkAURCommand
         conf.updateRepoCommand = decode["updateRepoCommand"] ?? conf.updateRepoCommand
         conf.updateCommand = decode["updateCommand"] ?? conf.updateCommand
-        conf.checkUpdateInterval = Int(decode["checkUpdateInterval"] ?? "") ?? 1800
+        conf.checkUpdateInterval = Int(decode["checkUpdateInterval"] ?? "") ?? conf.checkUpdateInterval
+        if let iconPath = decode["icon"] {
+            if !FileManager.default.fileExists(atPath: iconPath) {
+                print("File at path \(iconPath) does not exist. Using default icon instead.")
+            } else {
+                conf.icon = URL(fileURLWithPath: iconPath).absoluteString
+            }
+        }
 
         return conf
     }
 
     private static func decode(_ str: String) -> [String:String] {
         str.split(separator: "\n").reduce(into: [String: String]()) { acc, elem in
-            let split = elem.split(separator: "=").map(String.init)
+            let split = elem.split(separator: "=")
+                .map(String.init)
+                .map({ $0.trimmingCharacters(in: .whitespaces)})
             acc[split[0]] = split[1]
         }
     }

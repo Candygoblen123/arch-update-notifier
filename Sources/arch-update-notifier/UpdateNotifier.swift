@@ -12,6 +12,7 @@ actor UpdateNotifier {
         guard let config = config else {
             fatalError("Config object is null. This should never happen. What did you do?")
         }
+        print(config)
 
         let mainLoop = g_main_loop_new(nil, 0)
         notifServer = try await NotificationServer("Arch update notifier", appID: "moe.candy123.ArchUpdateNotifier")
@@ -32,6 +33,7 @@ actor UpdateNotifier {
                     let _ = try await notifServer.newNotification(
                         "Updates Available",
                         body: "Outdated from repos: \(pacCount)\nOutdated from AUR: \(yayCount)",
+                        icon: config.icon ?? "computer",
                         actions: [
                             "Update": { notif in
                                 let yayUpdateCmd = config.updateCommand.split(separator: " ").map({ String($0) })

@@ -17,14 +17,14 @@ actor NotificationServer: Sendable {
         )
     }
 
-    func newNotification(_ summary: String, body: String, actions: KeyValuePairs<String, @Sendable (Notification) async -> ()> = [:]) async throws -> Notification {
+    func newNotification(_ summary: String, body: String, icon: String, actions: KeyValuePairs<String, @Sendable (Notification) async -> ()> = [:]) async throws -> Notification {
         let stringActions: [String] = actions.enumerated()
             .flatMap({(index, name) in [String(index), name.key]})
         let variantActions = stringActions.map({ g_variant_new_string($0) })
         let argsArr = [
             g_variant_new_string(appName),
             g_variant_new_uint32(0),
-            g_variant_new_string("moe.candy123-ArchUpdateNotifier"),
+            g_variant_new_string(icon),
             g_variant_new_string(summary),
             g_variant_new_string(body),
             g_variant_new_array(g_variant_type_new("s"), variantActions, UInt(variantActions.count)),
