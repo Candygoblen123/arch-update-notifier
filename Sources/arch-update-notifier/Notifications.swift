@@ -17,6 +17,10 @@ actor NotificationServer: Sendable {
         )
     }
 
+    func close() async {
+        await dbus.close()
+    }
+
     func newNotification(_ summary: String, body: String, icon: String, actions: KeyValuePairs<String, @Sendable (Notification) async -> ()> = [:]) async throws -> Notification {
         let stringActions: [String] = actions.enumerated()
             .flatMap({(index, name) in [String(index), name.key]})

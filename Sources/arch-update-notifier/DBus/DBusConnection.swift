@@ -14,6 +14,16 @@ actor DBusConnection {
         }
     }
 
+    func close() {
+        var err: UnsafeMutablePointer<GError>? = nil
+        let success = g_dbus_connection_close_sync(connection.pointer, nil, &err)
+        if (success != 1) {
+            if let message = err?.pointee.message {
+                print("Error closing dbus connection: \(message)")
+            }
+        }
+    }
+
     private static func ownName(_ name: String) async -> (SendableOpaquePointer?, String) {
         await withCheckedContinuation { continuation in
             let mainLoop = g_main_loop_new(nil, 0)
