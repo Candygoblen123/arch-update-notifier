@@ -11,7 +11,7 @@ let package = Package(
         .executableTarget(
             name: "arch-update-notifier",
             dependencies: [
-                .target(name: "Gio")
+                .target(name: "Gio"),
             ]),
         .systemLibrary(name: "Gio", pkgConfig: "gio-2.0"),
     ]
